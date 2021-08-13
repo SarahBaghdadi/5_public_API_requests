@@ -6,11 +6,12 @@
 // Refer to the mockups and the comments in the index.html file for an example of what info should be displayed on the page and how it should be styled.
 
 
-
-const data = fetch('https://randomuser.me/api/')
+for (let i = 0; i < 12; i++) {
+    fetch('https://randomuser.me/api/')
     .then(response => response.json())
     .then(data => generatePerson(data.results[0]))
     .then(results => generateHTML(results))
+}
 
 function generatePerson(data) {
     const person = new Person(data);
