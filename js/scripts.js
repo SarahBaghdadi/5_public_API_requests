@@ -1,7 +1,14 @@
+let people = [];
+
 fetch('https://randomuser.me/api/?results=12')
     .then(response => response.json())
-    .then(data => data.results
-        .forEach((element) => {let person = new Person(element); person.generateHTML()})
+    .then(data => 
+        data.results.forEach((element, index) => {
+            let person = new Person(element); 
+            people.push(person); 
+            person.index = index;
+            generateHTML(person);
+        })
     )
 
 class Person {
@@ -16,43 +23,47 @@ class Person {
         this.birthday = data.dob.date;
         this.address = `${data.location.street.number} ${data.location.street.name} <br> ${data.location.city}, ${data.location.state} ${data.location.postcode} <br> ${data.location.country}`
     }
+}
 
-    generateHTML(){
-        let html = `<div class="card">
-            <div class="card-img-container">
-                <img class="card-img" src="${this.image}" alt="profile picture">
-            </div>
-            <div class="card-info-container">
-                <h3 id="name" class="card-name cap">${this.firstName} ${this.lastName}</h3>
-                <p class="card-text">${this.email}</p>
-                <p class="card-text cap">${this.city}, ${this.state}</p>
-            </div>
-        </div>`;
-        document.querySelector('#gallery').insertAdjacentHTML('beforeend', html);
-    }
+function generateHTML(person) {
+    let html = 
+    `<div class="card" id="card${person.index}">
+        <div class="card-img-container">
+            <img class="card-img" src="${person.image}" alt="profile picture">
+        </div>
+        <div class="card-info-container">
+            <h3 id="${person.firstName}${person.lastName}" class="card-name cap">${person.firstName} ${person.lastName}</h3>
+            <p class="card-text">${person.email}</p>
+            <p class="card-text cap">${person.city}, ${person.state}</p>
+        </div>
+    </div>`;
+    document.querySelector('#gallery').insertAdjacentHTML('beforeend', html);
+}
 
-    generateModal() { 
-        let modal = `
-        <div class="modal-container">
+
+class Modal {
+    constructor(person) {
+        this.html = 
+        `<div class="modal-container">
             <div class="modal">
                 <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
                 <div class="modal-info-container">
-                    <img class="modal-img" src="${this.image}" alt="profile picture">
-                    <h3 id="name" class="modal-name cap">${this.firstName} ${this.lastName}</h3>
-                    <p class="modal-text">${this.email}</p>
-                    <p class="modal-text cap">${this.city}</p>
+                    <img class="modal-img" src="${person.image}" alt="profile picture">
+                    <h3 id="name" class="modal-name cap">${person.firstName} ${person.lastName}</h3>
+                    <p class="modal-text">${person.email}</p>
+                    <p class="modal-text cap">${person.city}</p>
                     <hr>
-                    <p class="modal-text">${this.cell}</p>
-                    <p class="modal-text">${this.address}</p>
-                    <p class="modal-text">Birthday: ${this.birthday}</p>
+                    <p class="modal-text">${person.cell}</p>
+                    <p class="modal-text">${person.address}</p>
+                    <p class="modal-text">Birthday: ${person.birthday}</p>
                 </div>
             </div>
-
-            // IMPORTANT: Below is only for exceeds tasks 
             <div class="modal-btn-container">
                 <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
                 <button type="button" id="modal-next" class="modal-next btn">Next</button>
             </div>
-        </div>`;
+        </div>`
     }
 }
+
+
