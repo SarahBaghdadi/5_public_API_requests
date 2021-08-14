@@ -1,4 +1,6 @@
 let people = [];
+let gallery = document.querySelector('#gallery');
+
 
 fetch('https://randomuser.me/api/?results=12')
     .then(response => response.json())
@@ -37,7 +39,7 @@ function generateHTML(person) {
             <p class="card-text cap">${person.city}, ${person.state}</p>
         </div>
     </div>`;
-    document.querySelector('#gallery').insertAdjacentHTML('beforeend', html);
+    gallery.insertAdjacentHTML('beforeend', html);
 }
 
 
@@ -66,4 +68,10 @@ class Modal {
     }
 }
 
+gallery.addEventListener('click', (e) => {
+    let parentCard = e.target.closest('.card');
+    let cardIndex = parentCard.id.substring(4);
+    let modal = new Modal(people[cardIndex]);
+    gallery.insertAdjacentHTML('beforeend', modal.html);
+})
 
