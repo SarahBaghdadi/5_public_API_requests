@@ -47,6 +47,8 @@ function generateHTML(person) {
 // Modal object
 class Modal {
     constructor(person) {
+        this.phone = phone(person.cell);
+        this.date = date(person.birthday);
         this.html = 
         `<div class="modal-container">
             <div class="modal">
@@ -57,34 +59,47 @@ class Modal {
                     <p class="modal-text">${person.email}</p>
                     <p class="modal-text cap">${person.city}</p>
                     <hr>
-                    <p class="modal-text">${person.cell}</p>
+                    <p class="modal-text">${this.phone}</p>
                     <p class="modal-text">${person.address}</p>
-                    <p class="modal-text">Birthday: ${person.birthday}</p>
+                    <p class="modal-text">Birthday: ${this.date}</p>
                 </div>
             </div>
             <div class="modal-btn-container">
                 <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
                 <button type="button" id="modal-next" class="modal-next btn">Next</button>
             </div>
-        </div>`
+        </div>`;
     }
 }
 
 // Listen for card clicks and create Modal
 gallery.addEventListener('click', (e) => {
-    let parentCard = e.target.closest('.card');
-    if (parentCard){
-        let cardIndex = parentCard.id.substring(4);
-    let modal = new Modal(people[cardIndex]);
+    let card = e.target.closest('.card');
+    if (card){
+        let index = card.id.substring(4);
+    let modal = new Modal(people[index]);
     gallery.insertAdjacentHTML('beforeend', modal.html);
     }
 })
 
 // Listen for close modal clicks and close modal
-
 gallery.addEventListener('click', (e) => {
     if (e.target.closest('#modal-close-btn'))
     document.querySelector('.modal-container').remove();
 });
 
+// Phone numbers
+function phone(number) {
+    let numberCleaned = number.replaceAll((/[^\d]/g), '');
+    let numberFormatted = numberCleaned.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+    return numberFormatted;
+}
+
+// Dates
+function date(number) {
+    let year = number.substring(0,4);
+    let month = number.substring(5,7);
+    let day = number.substring(8,10);
+    return `${month}/${day}/${year}`;
+}
 
