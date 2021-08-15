@@ -1,7 +1,7 @@
 let people = [];
 let gallery = document.querySelector('#gallery');
 
-
+// Create array of people, call generate HTML on each person
 fetch('https://randomuser.me/api/?results=12')
     .then(response => response.json())
     .then(data => 
@@ -13,6 +13,7 @@ fetch('https://randomuser.me/api/?results=12')
         })
     )
 
+// Person object
 class Person {
     constructor(data) {
         this.image = data.picture.large;
@@ -27,6 +28,7 @@ class Person {
     }
 }
 
+//Generate HTML
 function generateHTML(person) {
     let html = 
     `<div class="card" id="card${person.index}">
@@ -42,7 +44,7 @@ function generateHTML(person) {
     gallery.insertAdjacentHTML('beforeend', html);
 }
 
-
+// Modal object
 class Modal {
     constructor(person) {
         this.html = 
@@ -68,10 +70,21 @@ class Modal {
     }
 }
 
+// Listen for card clicks and create Modal
 gallery.addEventListener('click', (e) => {
     let parentCard = e.target.closest('.card');
-    let cardIndex = parentCard.id.substring(4);
+    if (parentCard){
+        let cardIndex = parentCard.id.substring(4);
     let modal = new Modal(people[cardIndex]);
     gallery.insertAdjacentHTML('beforeend', modal.html);
+    }
 })
+
+// Listen for close modal clicks and close modal
+
+gallery.addEventListener('click', (e) => {
+    if (e.target.closest('#modal-close-btn'))
+    document.querySelector('.modal-container').remove();
+});
+
 
