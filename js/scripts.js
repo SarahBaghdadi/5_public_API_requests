@@ -72,10 +72,25 @@ class Modal {
     }
 }
 
+// Format phone numbers
+function phone(number) {
+    let numberCleaned = number.replaceAll((/[^\d]/g), '');
+    let numberFormatted = numberCleaned.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+    return numberFormatted;
+}
+
+// Format dates
+function date(number) {
+    let year = number.substring(0,4);
+    let month = number.substring(5,7);
+    let day = number.substring(8,10);
+    return `${month}/${day}/${year}`;
+}
+
 // Listen for card clicks and create Modal
 gallery.addEventListener('click', (e) => {
     let card = e.target.closest('.card');
-    if (card){
+    if (card) {
         let index = card.id.substring(4);
         let modal = new Modal(people[index]);
         gallery.insertAdjacentHTML('beforeend', modal.html);
@@ -83,11 +98,34 @@ gallery.addEventListener('click', (e) => {
     }
 })
 
+// Listen for close modal clicks and close modal
+gallery.addEventListener('click', (e) => {
+    if (e.target.closest('#modal-close-btn'))
+    closeModal();
+});
+
+// Advance modal function
+function advanceModal(index) {
+    let modal = new Modal(people[index]);
+    closeModal();
+    gallery.insertAdjacentHTML('beforeend', modal.html); 
+    modalNav();
+}
+
+// Close modal function
+function closeModal(){
+    document.querySelector('.modal-container').remove();
+}
+
+// Add navigation to modal
 function modalNav() {
     const modalButtons = document.querySelector('.modal-btn-container');
     modalButtons.addEventListener('click', (e) => {
+
+        // Get index from current modal
         let index = parseInt(document.querySelector('.modal').id.substr(5));
-       
+
+        // Next modal
         const next = document.querySelector('#modal-next');
         if (e.target === next) {
             if (index != 11) {
@@ -97,6 +135,7 @@ function modalNav() {
             }
         }
 
+        // Previous modal
         const prev = document.querySelector('#modal-prev');
         if (e.target === prev) {
             if (index != 0) {
@@ -107,38 +146,6 @@ function modalNav() {
         }
     })
 };
-
-function advanceModal(index) {
-    let modal = new Modal(people[index]);
-    closeModal();
-    gallery.insertAdjacentHTML('beforeend', modal.html); 
-    modalNav();
-}
-
-function closeModal(){
-    document.querySelector('.modal-container').remove();
-}
-
-// Listen for close modal clicks and close modal
-gallery.addEventListener('click', (e) => {
-    if (e.target.closest('#modal-close-btn'))
-    closeModal();
-});
-
-// Phone numbers
-function phone(number) {
-    let numberCleaned = number.replaceAll((/[^\d]/g), '');
-    let numberFormatted = numberCleaned.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
-    return numberFormatted;
-}
-
-// Dates
-function date(number) {
-    let year = number.substring(0,4);
-    let month = number.substring(5,7);
-    let day = number.substring(8,10);
-    return `${month}/${day}/${year}`;
-}
 
 // Add search box to DOM
 const searchContainer = document.querySelector('.search-container');
