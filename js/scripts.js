@@ -87,15 +87,23 @@ function modalNav() {
     const modalButtons = document.querySelector('.modal-btn-container');
     modalButtons.addEventListener('click', (e) => {
         let index = parseInt(document.querySelector('.modal').id.substr(5));
-        
+       
         const next = document.querySelector('#modal-next');
         if (e.target === next) {
-            advanceModal(index + 1); 
+            if (index != 11) {
+                advanceModal(index + 1); 
+            } else {
+                advanceModal(0); 
+            }
         }
 
         const prev = document.querySelector('#modal-prev');
         if (e.target === prev) {
-            advanceModal(index - 1); 
+            if (index != 0) {
+                advanceModal(index - 1); 
+            } else {
+                advanceModal(11); 
+            }
         }
     })
 };
