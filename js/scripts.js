@@ -51,7 +51,7 @@ class Modal {
         this.date = date(person.birthday);
         this.html = 
         `<div class="modal-container">
-            <div class="modal">
+            <div class="modal" id="modal${person.index}">
                 <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
                 <div class="modal-info-container">
                     <img class="modal-img" src="${person.image}" alt="profile picture">
@@ -77,15 +77,44 @@ gallery.addEventListener('click', (e) => {
     let card = e.target.closest('.card');
     if (card){
         let index = card.id.substring(4);
-    let modal = new Modal(people[index]);
-    gallery.insertAdjacentHTML('beforeend', modal.html);
+        let modal = new Modal(people[index]);
+        gallery.insertAdjacentHTML('beforeend', modal.html);
+        modalNav();
     }
 })
+
+function modalNav() {
+    const modalButtons = document.querySelector('.modal-btn-container');
+    modalButtons.addEventListener('click', (e) => {
+        let index = parseInt(document.querySelector('.modal').id.substr(5));
+        
+        const next = document.querySelector('#modal-next');
+        if (e.target === next) {
+            advanceModal(index + 1); 
+        }
+
+        const prev = document.querySelector('#modal-prev');
+        if (e.target === prev) {
+            advanceModal(index - 1); 
+        }
+    })
+};
+
+function advanceModal(index) {
+    let modal = new Modal(people[index]);
+    closeModal();
+    gallery.insertAdjacentHTML('beforeend', modal.html); 
+    modalNav();
+}
+
+function closeModal(){
+    document.querySelector('.modal-container').remove();
+}
 
 // Listen for close modal clicks and close modal
 gallery.addEventListener('click', (e) => {
     if (e.target.closest('#modal-close-btn'))
-    document.querySelector('.modal-container').remove();
+    closeModal();
 });
 
 // Phone numbers
