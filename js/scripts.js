@@ -165,8 +165,11 @@ function simpleSearch(data) {
         let searchParamaters = search.length != 0 && fullName.toLowerCase().includes(search.toLowerCase());
         if (searchParamaters) {
             searchResults.push(data[i]);
+        } else if (search.length === 0) {
+            searchResults = people;
         }
     }
+    console.log(searchResults);
     return searchResults;
 }
 
@@ -174,8 +177,8 @@ function simpleSearch(data) {
 searchContainer.addEventListener('click', (e) => {
     const submit = document.querySelector('#search-submit');
     if (e.target === submit ){
-        console.log('click');
-        simpleSearch(people);
+        document.querySelectorAll('.card').forEach(item => {item.remove()});
+        simpleSearch(people).forEach( item => generateHTML(item));    
     }
 });
 
