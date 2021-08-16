@@ -90,6 +90,7 @@ header h1 {
     border: 1px solid rgba(50, 50, 50, 0.3);
     transition: .4s ease-out;
     overflow: hidden;
+    box-shadow: 0 2px 10px #bfbfbf;
 }
 
 .card-img {
