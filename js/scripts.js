@@ -2,7 +2,7 @@ let people = [];
 let gallery = document.querySelector('#gallery');
 
 // Create array of people, call generate HTML on each person
-fetch('https://randomuser.me/api/?results=12')
+fetch('https://randomuser.me/api/?results=12&nat=US')
     .then(response => response.json())
     .then(data => 
         data.results.forEach((element, index) => {
@@ -102,4 +102,40 @@ function date(number) {
     let day = number.substring(8,10);
     return `${month}/${day}/${year}`;
 }
+
+// Add search box to DOM
+const searchContainer = document.querySelector('.search-container');
+const searchHTML = 
+`<form action="#" method="get">
+    <input type="search" id="search-input" class="search-input" placeholder="Search...">
+    <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
+</form>`;
+searchContainer.insertAdjacentHTML('beforeend', searchHTML);
+
+// Search function
+function simpleSearch(data) {
+    const search = document.querySelector('#search-input').value; // Search input element
+    let searchResults = [];
+    for (let i = 0; i < data.length; i++){
+        let fullName = `${data[i].firstName} ${data[i].lastName}`;
+        let searchParamaters = search.length != 0 && fullName.toLowerCase().includes(search.toLowerCase());
+        if (searchParamaters) {
+            searchResults.push(data[i]);
+        }
+    }
+    return searchResults;
+}
+
+// Call search on click
+searchContainer.addEventListener('click', (e) => {
+    const submit = document.querySelector('#search-submit');
+    if (e.target === submit ){
+        console.log('click');
+        simpleSearch(people);
+    }
+});
+
+
+
+
 
