@@ -99,9 +99,8 @@ gallery.addEventListener('click', (e) => {
     let card = e.target.closest('.card');
     if (card) {
         let name = card.querySelector('h3').textContent;
-        let index = getNames(currentArray, 'name').indexOf(name);
-        let person = currentArray[index];
-        createModal(person);
+        let index = getIndex(name);
+        createModal(currentArray[index]);
     }
 })
 
@@ -203,10 +202,18 @@ searchContainer.addEventListener('click', (e) => {
     }
 });
 
-// Get name from HTML
+// Get index from name
+const getIndex = (name) => {
 
-// Flatten currentArray to just names
+    // Flatten array
+    let flatArray = (array, prop) => {
+        flatArray = [];
+        array.forEach(item => flatArray.push(item[prop]));
+        return flatArray;
+    }
+    flatArray(currentArray, 'name');
 
-// Get index in currentArray of name
-
-// Call new modal on currentArray[index]
+    // Get and return index of name
+    let currentIndex = flatArray.indexOf(name);
+    return (currentIndex);
+}
