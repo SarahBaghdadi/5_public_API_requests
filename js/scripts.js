@@ -130,38 +130,36 @@ const closeModal = () => {
 
 // Add navigation to modal
 const modalNav = () => {
+    const modalContainer = document.querySelector('.modal-container');
     const modalButtons = document.querySelector('.modal-btn-container');
+    const next = document.querySelector('#modal-next');
+    const prev = document.querySelector('#modal-prev');
+
     modalButtons.addEventListener('click', (e) => {
+        let name = modalContainer.querySelector('h3').textContent;
+        let index = getIndex(name);
 
         // Next modal
-        const next = document.querySelector('#modal-next');
         if (e.target === next) {
-            let modalContainer = document.querySelector('.modal-container')
-            let name = modalContainer.querySelector('h3').textContent;
-            let index = getNames(currentArray, 'name').indexOf(name) + 1;
-            let limit = currentArray.length;
+            let limit = currentArray.length - 1;
             if (index === limit) {
-               index = 0; 
+                index = 0; 
+            } else {
+                index ++;
             }
-            let person = currentArray[index];
-            closeModal();
-            createModal(person);
         }
 
         // Previous modal
-        const prev = document.querySelector('#modal-prev');
-        if (e.target === prev) {
-            let modalContainer = document.querySelector('.modal-container')
-            let name = modalContainer.querySelector('h3').textContent;
-            let index = getNames(currentArray, 'name').indexOf(name) - 1;
-            let limit = -1;
+        if (e.target === prev) {    
+            let limit = 0;
             if (index === limit) {
-               index = currentArray.length - 1;
+                index = currentArray.length - 1;
+            } else {
+                index --
             }
-            let person = currentArray[index];
-            closeModal();
-            createModal(person);
         }
+        closeModal();
+        createModal(currentArray[index]);
     })
 };
 
