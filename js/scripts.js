@@ -149,6 +149,10 @@ function modalNav() {
                 array = people;
             }
             let index = getNames(array, 'name').indexOf(name) + 1;
+            let limit = array.length;
+            if (index === limit) {
+               index = 0; 
+            }
             let person = array[index];
             closeModal();
             let modal = new Modal(person);
@@ -168,6 +172,10 @@ function modalNav() {
                 array = people;
             }
             let index = getNames(array, 'name').indexOf(name) - 1;
+            let limit = -1;
+            if (index === limit) {
+               index = array.length - 1;
+            }
             let person = array[index];
             closeModal();
             let modal = new Modal(person);
@@ -225,16 +233,16 @@ let arr = [0,1,2,3,4,5,6,7,8,9];
 let resultsArr = [0,4,6,9];
 
 
-function navigate (array, item) {
-    let currentItem = array.indexOf(item);
-    //console.log(`Starts at ${currentItem}`);
-    currentItem = array.indexOf(item) + 1;
-    //console.log(`Ends at ${currentItem}`)
-    //console.log(`New item is ${array[currentItem]}`)
+function navigate (array, item, int) {
+    let currentIndex = array.indexOf(item);
+    console.log(`Starting item is ${item} at index ${currentIndex}`);
+    newIndex = currentIndex + int;
+    newItem = array[newIndex];
+    console.log(`Ending item is ${newItem} at index ${newIndex}`)
 }
 
-navigate(arr, 4);
-navigate(resultsArr, 4);
+navigate(arr, 4, -1);
+navigate(resultsArr, 4, -1);
 
 let objects = [
     {'tree': 'walnut'},
