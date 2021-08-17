@@ -1,6 +1,6 @@
 let people = [];
+let currentArray = people;
 let gallery = document.querySelector('#gallery');
-let searching = false;
 
 // Create array of people, call generate HTML on each person
 fetch('https://randomuser.me/api/?results=12&nat=US')
@@ -28,7 +28,7 @@ class Person {
 }
 
 //Generate HTML
-function generateHTML(person) {
+const generateHTML = (person) => {
     let html = 
     `<div class="card">
         <div class="card-img-container">
@@ -72,14 +72,14 @@ class Modal {
 }
 
 // Format phone numbers
-function phone(number) {
+const phone = (number) => {
     let numberCleaned = number.replaceAll((/[^\d]/g), '');
     let numberFormatted = numberCleaned.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
     return numberFormatted;
 }
 
 // Format dates
-function date(number) {
+const date = (number) => {
     let year = number.substring(0,4);
     let month = number.substring(5,7);
     let day = number.substring(8,10);
@@ -87,7 +87,7 @@ function date(number) {
 }
 
 // Get names from array
-function getNames(array, prop) {
+const getNames = (array, prop) => {
     let names = [];
     array.forEach(item => names.push(item[prop]));
     return names;
@@ -99,17 +99,9 @@ gallery.addEventListener('click', (e) => {
     let card = e.target.closest('.card');
     if (card) {
         let name = card.querySelector('h3').textContent;
-        let array;
-        if (searching) {
-            array = searchResults;
-        } else {
-            array = people;
-        }
-        let index = getNames(array, 'name').indexOf(name);
-        let person = array[index];
-        let modal = new Modal(person);
-        gallery.insertAdjacentHTML('beforeend', modal.html);
-        modalNav();
+        let index = getNames(currentArray, 'name').indexOf(name);
+        let person = currentArray[index];
+        createModal(person);
     }
 })
 
@@ -119,21 +111,26 @@ gallery.addEventListener('click', (e) => {
     closeModal();
 });
 
-// Advance modal function
-function advanceModal(person) {
-    closeModal();
+// Create Modal
+const createModal = (person) => {
     let modal = new Modal(person);
-    gallery.insertAdjacentHTML('beforeend', modal.html); 
+    gallery.insertAdjacentHTML('beforeend', modal.html);
     modalNav();
 }
 
+// Advance modal function
+const advanceModal = (person) => {
+    closeModal();
+    createModal(person);
+}
+
 // Close modal function
-function closeModal(){
+const closeModal = () => {
     document.querySelector('.modal-container').remove();
 }
 
 // Add navigation to modal
-function modalNav() {
+const modalNav = () => {
     const modalButtons = document.querySelector('.modal-btn-container');
     modalButtons.addEventListener('click', (e) => {
 
@@ -142,22 +139,14 @@ function modalNav() {
         if (e.target === next) {
             let modalContainer = document.querySelector('.modal-container')
             let name = modalContainer.querySelector('h3').textContent;
-            let array;
-            if (searching) {
-                array = searchResults;
-            } else {
-                array = people;
-            }
-            let index = getNames(array, 'name').indexOf(name) + 1;
-            let limit = array.length;
+            let index = getNames(currentArray, 'name').indexOf(name) + 1;
+            let limit = currentArray.length;
             if (index === limit) {
                index = 0; 
             }
-            let person = array[index];
+            let person = currentArray[index];
             closeModal();
-            let modal = new Modal(person);
-            gallery.insertAdjacentHTML('beforeend', modal.html);
-            modalNav();
+            createModal(person);
         }
 
         // Previous modal
@@ -165,22 +154,14 @@ function modalNav() {
         if (e.target === prev) {
             let modalContainer = document.querySelector('.modal-container')
             let name = modalContainer.querySelector('h3').textContent;
-            let array;
-            if (searching) {
-                array = searchResults;
-            } else {
-                array = people;
-            }
-            let index = getNames(array, 'name').indexOf(name) - 1;
+            let index = getNames(currentArray, 'name').indexOf(name) - 1;
             let limit = -1;
             if (index === limit) {
-               index = array.length - 1;
+               index = currentArray.length - 1;
             }
-            let person = array[index];
+            let person = currentArray[index];
             closeModal();
-            let modal = new Modal(person);
-            gallery.insertAdjacentHTML('beforeend', modal.html);
-            modalNav();
+            createModal(person);
         }
     })
 };
@@ -195,8 +176,7 @@ const searchHTML =
 searchContainer.insertAdjacentHTML('beforeend', searchHTML);
 
 // Search function
-function simpleSearch(data) {
-    searching = true;
+const simpleSearch = (data) => {
     const search = document.querySelector('#search-input').value; // Search input element
     searchResults = [];
     for (let i = 0; i < data.length; i++){
@@ -208,6 +188,7 @@ function simpleSearch(data) {
             searchResults = people;
         }
     }
+    currentArray = searchResults;
     return searchResults;
 }
 
@@ -222,34 +203,10 @@ searchContainer.addEventListener('click', (e) => {
     }
 });
 
+// Get name from HTML
 
+// Flatten currentArray to just names
 
+// Get index in currentArray of name
 
-
-// Try new system
-
-let arr = [0,1,2,3,4,5,6,7,8,9];
-
-let resultsArr = [0,4,6,9];
-
-
-function navigate (array, item, int) {
-    let currentIndex = array.indexOf(item);
-    console.log(`Starting item is ${item} at index ${currentIndex}`);
-    newIndex = currentIndex + int;
-    newItem = array[newIndex];
-    console.log(`Ending item is ${newItem} at index ${newIndex}`)
-}
-
-navigate(arr, 4, -1);
-navigate(resultsArr, 4, -1);
-
-let objects = [
-    {'tree': 'walnut'},
-    {'tree': 'maple'},
-    {'tree': 'ash'}
-];
-
-
-
-
+// Call new modal on currentArray[index]
