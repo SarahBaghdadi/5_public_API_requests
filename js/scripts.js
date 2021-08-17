@@ -93,6 +93,21 @@ const getNames = (array, prop) => {
     return names;
 }
 
+// Get index from name
+const getIndex = (name) => {
+
+    // Flatten array
+    let flatArray = (array, prop) => {
+        flatArray = [];
+        array.forEach(item => flatArray.push(item[prop]));
+        return flatArray;
+    }
+    flatArray(currentArray, 'name');
+
+    // Get and return index of name
+    let currentIndex = flatArray.indexOf(name);
+    return (currentIndex);
+}
 
 // Listen for card clicks and create Modal
 gallery.addEventListener('click', (e) => {
@@ -174,7 +189,7 @@ searchContainer.insertAdjacentHTML('beforeend', searchHTML);
 
 // Search function
 const simpleSearch = (data) => {
-    const search = document.querySelector('#search-input').value; // Search input element
+    const search = document.querySelector('#search-input').value;
     searchResults = [];
     for (let i = 0; i < data.length; i++){
         let fullName = `${data[i].name}`;
@@ -199,19 +214,3 @@ searchContainer.addEventListener('click', (e) => {
         });    
     }
 });
-
-// Get index from name
-const getIndex = (name) => {
-
-    // Flatten array
-    let flatArray = (array, prop) => {
-        flatArray = [];
-        array.forEach(item => flatArray.push(item[prop]));
-        return flatArray;
-    }
-    flatArray(currentArray, 'name');
-
-    // Get and return index of name
-    let currentIndex = flatArray.indexOf(name);
-    return (currentIndex);
-}
