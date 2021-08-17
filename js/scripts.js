@@ -1,14 +1,14 @@
 let people = [];
 let gallery = document.querySelector('#gallery');
+let searching = false;
 
 // Create array of people, call generate HTML on each person
 fetch('https://randomuser.me/api/?results=12&nat=US')
     .then(response => response.json())
     .then(data => 
-        data.results.forEach((element, index) => {
+        data.results.forEach((element) => {
             let person = new Person(element); 
             people.push(person); 
-            person.index = index;
             generateHTML(person);
         })
     )
@@ -17,8 +17,7 @@ fetch('https://randomuser.me/api/?results=12&nat=US')
 class Person {
     constructor(data) {
         this.image = data.picture.large;
-        this.firstName = data.name.first;
-        this.lastName = data.name.last;
+        this.name = `${data.name.first} ${data.name.last}`;
         this.email = data.email;
         this.city = data.location.city;
         this.state = data.location.state;
@@ -31,12 +30,12 @@ class Person {
 //Generate HTML
 function generateHTML(person) {
     let html = 
-    `<div class="card" id="card${person.index}">
+    `<div class="card">
         <div class="card-img-container">
             <img class="card-img" src="${person.image}" alt="profile picture">
         </div>
         <div class="card-info-container">
-            <h3 id="${person.firstName}${person.lastName}" class="card-name cap">${person.firstName} ${person.lastName}</h3>
+            <h3 id="${person.name.replace(/\s/g, '')}" class="card-name cap">${person.name}</h3>
             <p class="card-text">${person.email}</p>
             <p class="card-text cap">${person.city}, ${person.state}</p>
         </div>
@@ -51,11 +50,11 @@ class Modal {
         this.date = date(person.birthday);
         this.html = 
         `<div class="modal-container">
-            <div class="modal" id="modal${person.index}">
+            <div class="modal">
                 <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
                 <div class="modal-info-container">
                     <img class="modal-img" src="${person.image}" alt="profile picture">
-                    <h3 id="name" class="modal-name cap">${person.firstName} ${person.lastName}</h3>
+                    <h3 id="name" class="modal-name cap">${person.name}</h3>
                     <p class="modal-text">${person.email}</p>
                     <p class="modal-text cap">${person.city}</p>
                     <hr>
@@ -87,12 +86,28 @@ function date(number) {
     return `${month}/${day}/${year}`;
 }
 
+// Get names from array
+function getNames(array, prop) {
+    let names = [];
+    array.forEach(item => names.push(item[prop]));
+    return names;
+}
+
+
 // Listen for card clicks and create Modal
 gallery.addEventListener('click', (e) => {
     let card = e.target.closest('.card');
     if (card) {
-        let index = card.id.substring(4);
-        let modal = new Modal(people[index]);
+        let name = card.querySelector('h3').textContent;
+        let array;
+        if (searching) {
+            array = searchResults;
+        } else {
+            array = people;
+        }
+        let index = getNames(array, 'name').indexOf(name);
+        let person = array[index];
+        let modal = new Modal(person);
         gallery.insertAdjacentHTML('beforeend', modal.html);
         modalNav();
     }
@@ -105,9 +120,9 @@ gallery.addEventListener('click', (e) => {
 });
 
 // Advance modal function
-function advanceModal(index) {
-    let modal = new Modal(people[index]);
+function advanceModal(person) {
     closeModal();
+    let modal = new Modal(person);
     gallery.insertAdjacentHTML('beforeend', modal.html); 
     modalNav();
 }
@@ -122,27 +137,42 @@ function modalNav() {
     const modalButtons = document.querySelector('.modal-btn-container');
     modalButtons.addEventListener('click', (e) => {
 
-        // Get index from current modal
-        let index = parseInt(document.querySelector('.modal').id.substr(5));
-
         // Next modal
         const next = document.querySelector('#modal-next');
         if (e.target === next) {
-            if (index != 11) {
-                advanceModal(index + 1); 
+            let modalContainer = document.querySelector('.modal-container')
+            let name = modalContainer.querySelector('h3').textContent;
+            let array;
+            if (searching) {
+                array = searchResults;
             } else {
-                advanceModal(0); 
+                array = people;
             }
+            let index = getNames(array, 'name').indexOf(name) + 1;
+            let person = array[index];
+            closeModal();
+            let modal = new Modal(person);
+            gallery.insertAdjacentHTML('beforeend', modal.html);
+            modalNav();
         }
 
         // Previous modal
         const prev = document.querySelector('#modal-prev');
         if (e.target === prev) {
-            if (index != 0) {
-                advanceModal(index - 1); 
+            let modalContainer = document.querySelector('.modal-container')
+            let name = modalContainer.querySelector('h3').textContent;
+            let array;
+            if (searching) {
+                array = searchResults;
             } else {
-                advanceModal(11); 
+                array = people;
             }
+            let index = getNames(array, 'name').indexOf(name) - 1;
+            let person = array[index];
+            closeModal();
+            let modal = new Modal(person);
+            gallery.insertAdjacentHTML('beforeend', modal.html);
+            modalNav();
         }
     })
 };
@@ -158,10 +188,11 @@ searchContainer.insertAdjacentHTML('beforeend', searchHTML);
 
 // Search function
 function simpleSearch(data) {
+    searching = true;
     const search = document.querySelector('#search-input').value; // Search input element
-    let searchResults = [];
+    searchResults = [];
     for (let i = 0; i < data.length; i++){
-        let fullName = `${data[i].firstName} ${data[i].lastName}`;
+        let fullName = `${data[i].name}`;
         let searchParamaters = search.length != 0 && fullName.toLowerCase().includes(search.toLowerCase());
         if (searchParamaters) {
             searchResults.push(data[i]);
@@ -169,7 +200,6 @@ function simpleSearch(data) {
             searchResults = people;
         }
     }
-    console.log(searchResults);
     return searchResults;
 }
 
@@ -177,11 +207,40 @@ function simpleSearch(data) {
 searchContainer.addEventListener('click', (e) => {
     const submit = document.querySelector('#search-submit');
     if (e.target === submit ){
-        document.querySelectorAll('.card').forEach(item => {item.remove()});
-        simpleSearch(people).forEach( item => generateHTML(item));    
+        document.querySelectorAll('.card').forEach(item => item.remove());
+        simpleSearch(people).forEach( (item) => {
+            generateHTML(item);
+        });    
     }
 });
 
+
+
+
+
+// Try new system
+
+let arr = [0,1,2,3,4,5,6,7,8,9];
+
+let resultsArr = [0,4,6,9];
+
+
+function navigate (array, item) {
+    let currentItem = array.indexOf(item);
+    //console.log(`Starts at ${currentItem}`);
+    currentItem = array.indexOf(item) + 1;
+    //console.log(`Ends at ${currentItem}`)
+    //console.log(`New item is ${array[currentItem]}`)
+}
+
+navigate(arr, 4);
+navigate(resultsArr, 4);
+
+let objects = [
+    {'tree': 'walnut'},
+    {'tree': 'maple'},
+    {'tree': 'ash'}
+];
 
 
 
