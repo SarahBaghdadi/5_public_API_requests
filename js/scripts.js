@@ -1,6 +1,18 @@
+/*
+Treehouse Techdegree:
+FSJS Project 5 - Public API Requests
+==============================================
+*/
+
+// Global variables
 let people = [];
 let currentArray = people;
 let gallery = document.querySelector('#gallery');
+
+
+/* GET DATA AND INITIAL HTML
+=================================
+*/
 
 // Create array of people, call generate HTML on each person
 fetch('https://randomuser.me/api/?results=12&nat=US')
@@ -13,7 +25,7 @@ fetch('https://randomuser.me/api/?results=12&nat=US')
         })
     )
 
-// Person object
+// Person object 
 class Person {
     constructor(data) {
         this.image = data.picture.large;
@@ -27,7 +39,7 @@ class Person {
     }
 }
 
-//Generate HTML
+//Generate HTML function
 const generateHTML = (person) => {
     let html = 
     `<div class="card">
@@ -42,6 +54,11 @@ const generateHTML = (person) => {
     </div>`;
     gallery.insertAdjacentHTML('beforeend', html);
 }
+
+
+/* CREATE AND CLOSE MODALS
+============================
+*/
 
 // Modal object
 class Modal {
@@ -71,42 +88,11 @@ class Modal {
     }
 }
 
-// Format phone numbers
-const phone = (number) => {
-    let numberCleaned = number.replaceAll((/[^\d]/g), '');
-    let numberFormatted = numberCleaned.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
-    return numberFormatted;
-}
-
-// Format dates
-const date = (number) => {
-    let year = number.substring(0,4);
-    let month = number.substring(5,7);
-    let day = number.substring(8,10);
-    return `${month}/${day}/${year}`;
-}
-
-// Get names from array
-const getNames = (array, prop) => {
-    let names = [];
-    array.forEach(item => names.push(item[prop]));
-    return names;
-}
-
-// Get index from name
-const getIndex = (name) => {
-
-    // Flatten array
-    let flatArray = (array, prop) => {
-        flatArray = [];
-        array.forEach(item => flatArray.push(item[prop]));
-        return flatArray;
-    }
-    flatArray(currentArray, 'name');
-
-    // Get and return index of name
-    let currentIndex = flatArray.indexOf(name);
-    return (currentIndex);
+// Create Modal function 
+const createModal = (person) => {
+    let modal = new Modal(person);
+    gallery.insertAdjacentHTML('beforeend', modal.html);
+    modalNav();
 }
 
 // Listen for card clicks and create Modal
@@ -119,18 +105,22 @@ gallery.addEventListener('click', (e) => {
     }
 })
 
-// Listen for close modal clicks and close modal
+// Close modal function
+const closeModal = () => {
+    document.querySelector('.modal-container').remove();
+}
+
+// Listen for close clicks and close modal
 gallery.addEventListener('click', (e) => {
     if (e.target.closest('#modal-close-btn'))
     closeModal();
 });
 
-// Create Modal
-const createModal = (person) => {
-    let modal = new Modal(person);
-    gallery.insertAdjacentHTML('beforeend', modal.html);
-    modalNav();
-}
+
+/* MODAL NAVIGATION - 
+Advance forwards or backwards in current array of people, either search results or entire directory, via modals.
+==============================================
+*/
 
 // Advance modal function
 const advanceModal = (person) => {
@@ -138,23 +128,21 @@ const advanceModal = (person) => {
     createModal(person);
 }
 
-// Close modal function
-const closeModal = () => {
-    document.querySelector('.modal-container').remove();
-}
-
 // Add navigation to modal
 const modalNav = () => {
+
+    // Select elements 
     const modalContainer = document.querySelector('.modal-container');
     const modalButtons = document.querySelector('.modal-btn-container');
     const next = document.querySelector('#modal-next');
     const prev = document.querySelector('#modal-prev');
 
+    // Event listener gets name from HTML, gets the index of that person in the current array 
     modalButtons.addEventListener('click', (e) => {
         let name = modalContainer.querySelector('h3').textContent;
         let index = getIndex(name);
 
-        // Next modal
+        // If next button, increment index, or go from last number to first number
         if (e.target === next) {
             let limit = currentArray.length - 1;
             if (index === limit) {
@@ -164,7 +152,7 @@ const modalNav = () => {
             }
         }
 
-        // Previous modal
+        // If previous button, decrement index, or go from first number to last number
         if (e.target === prev) {    
             let limit = 0;
             if (index === limit) {
@@ -173,12 +161,19 @@ const modalNav = () => {
                 index --
             }
         }
+
+        // Close modal and create new modal from new index
         closeModal();
         createModal(currentArray[index]);
     })
 };
 
-// Add search box to DOM
+
+/* SEARCH
+============================
+*/
+
+// Add search HTML to DOM
 const searchContainer = document.querySelector('.search-container');
 const searchHTML = 
 `<form action="#" method="get">
@@ -187,7 +182,7 @@ const searchHTML =
 </form>`;
 searchContainer.insertAdjacentHTML('beforeend', searchHTML);
 
-// Search function
+// Search function - builds new array called searchResults and sets currentArray to searchResults
 const simpleSearch = (data) => {
     const search = document.querySelector('#search-input').value;
     searchResults = [];
@@ -214,3 +209,39 @@ searchContainer.addEventListener('click', (e) => {
         });    
     }
 });
+
+
+/* Helper functions
+============================
+*/
+
+// Format phone numbers
+const phone = (number) => {
+    let numberCleaned = number.replaceAll((/[^\d]/g), '');
+    let numberFormatted = numberCleaned.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+    return numberFormatted;
+}
+
+// Format dates
+const date = (number) => {
+    let year = number.substring(0,4);
+    let month = number.substring(5,7);
+    let day = number.substring(8,10);
+    return `${month}/${day}/${year}`;
+}
+
+// Get index from name
+const getIndex = (name) => {
+
+    // Flatten array
+    let flatArray = (array, prop) => {
+        flatArray = [];
+        array.forEach(item => flatArray.push(item[prop]));
+        return flatArray;
+    }
+    flatArray(currentArray, 'name');
+
+    // Get and return index of name
+    let currentIndex = flatArray.indexOf(name);
+    return (currentIndex);
+}
